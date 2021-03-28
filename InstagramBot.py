@@ -62,7 +62,7 @@ class Instagram:
         for pic_href in pic_hrefs:
             driver.get(pic_href)
             liked = driver.find_element_by_css_selector("[aria-label=Curtir]")
-            liked.click(); time.sleep(19)
+            liked.click(); time.sleep(20)
             driver.execute_script("window.scrollTo(0, 300);")
 
 bot = Instagram()
