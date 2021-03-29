@@ -3,7 +3,6 @@ import time
 from selenium.webdriver.common.keys import Keys
 import PySimpleGUI as sg
 
-
 class Instagram:
     def __init__(self):
         sg.theme('Reddit')
@@ -15,9 +14,9 @@ class Instagram:
             [sg.Button('Enviar')]
         ]
         #Janela
-        janela = sg.Window("Robo Instagram").layout(layout)
+        self.janela = sg.Window("Robo Instagram").layout(layout)
         #Extracao
-        self.button, self.valores = janela.Read()
+        self.button, self.valores = self.janela.Read()
         self.user = self.valores['user']
         self.password = self.valores['password']
         self.hashtag = self.valores['hashtag']
@@ -46,11 +45,11 @@ class Instagram:
         login = self.driver.find_element_by_xpath("//button[@type='submit']")
         time.sleep(1); login.click();time.sleep(4)
         #clica no botao entrar para efetuar o login
-        self.like(hashtag)
+        self.likeFollow(hashtag)
 
-    def like(self, hashtag):
+    def likeFollow(self, hashtag):
         driver = self.driver
-        driver.get('https://www.instagram.com/explore/tags/' + hashtag + '/')
+        driver.get('https://www.instagram.com/explore/tags/' + hashtag.replace(" ", "") + '/')
         for i in range(1, 3):
             driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
             time.sleep(3)
@@ -58,13 +57,28 @@ class Instagram:
         pic_hrefs = [elem.get_attribute('href') for elem in hrefs]
         [href for href in pic_hrefs if hashtag in href]
         print(hashtag + 'fotos' + str(len(pic_hrefs)))
-
+        contador = 0
         for pic_href in pic_hrefs:
+            
             driver.get(pic_href)
+            
             liked = driver.find_element_by_css_selector("[aria-label=Curtir]")
-            liked.click(); time.sleep(19)
+            follow = driver.find_element_by_xpath("//button[@class='sqdOP yWX7d    y3zKF     ']")
+            follow.click(); time.sleep(3);liked.click(); time.sleep(20)
+            
             driver.execute_script("window.scrollTo(0, 300);")
+            contador += 1
+
+            if contador == 300:
+                popup = sg.popup_ok_cancel("Limite de 300 curtidas atingidas, se continuar estará sujeito a ser silenciado pelo instagram\n\nClique OK para continuar curtindo" ) 
+                if popup == sg.METER_REASON_CANCELLED:
+                    break
+                else:
+                    continue
+            else:
+                continue
+        
 
 bot = Instagram()
 bot.login()
-bot.like()
+bot.likeFollow()
